@@ -1,0 +1,16 @@
+DE1_SOC.asm.rpt
+DE1_SOC.fit.rpt
+DE1_SOC.flow.rpt
+DE1_SOC.map.rpt
+DE1_SOC.sta.rpt
+*.summary
+*.bak
+*db*
+DE1_SOC.cdf
+DE1_SOC.done
+DE1_SOC.fit.smsg
+DE1_SOC.htm
+DE1_SOC.jdi
+DE1_SOC.sld
+c5_pin_model_dump.txt
+DE1_SOC.sof
