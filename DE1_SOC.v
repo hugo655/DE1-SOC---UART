@@ -61,26 +61,34 @@ wire back2back, recv_byte_en;
 //=======================================================
 
 
+//assign GPIO[1] = 1'b1;
+//assign LEDR[1] = GPIO[2];
+//assign LEDR[2] = GPIO[3];
+//assign GPIO[4] = 1'b0;
 assign LEDR[0] = ~KEY[0];
+
+
 
 uart my_uart( 	.clk(CLOCK_50),
 					.rst(~KEY[0]),
-					.rx(back2back),
-					.tx(back2back),
-					.transmit(~KEY[3]),
-					.tx_byte(gen2display),
+					.rx(GPIO[3]),
+					.tx(GPIO[1]),
+					.transmit(recv_byte_en),
+					.tx_byte(recv_byte),
 					.rx_byte(recv_byte),
 					.is_receiving(LEDR[8]),
 					.is_transmitting(LEDR[7]),
 					.received(recv_byte_en),
 					.recv_error(LEDR[9]));
 					
+
+/*
 byte_reg received_byte( .clk(CLOCK_50),
 								.en(recv_byte_en),
 								.byte_in(recv_byte),
 								.byte_out(uart2display),
 								.rst_n(KEY[0]));
-
+*/
 
 gen_hex lower_nibble(.switch(~KEY[1]),.rst_n(KEY[0]),.hex_number(gen2display[3:0]));
 gen_hex upper_nibble(.switch(~KEY[2]),.rst_n(KEY[0]),.hex_number(gen2display[7:4]));
