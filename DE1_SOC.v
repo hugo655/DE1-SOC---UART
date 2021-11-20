@@ -52,19 +52,16 @@ module DE1_SOC(
 //=======================================================
 
 
-wire [7:0] gen2display, uart2display, recv_byte;
-
-wire back2back, recv_byte_en;
+wire [7:0]  recv_byte, tx_byte;
+wire [7:0] bsr2decoder0,bsr2decoder1,bsr2decoder2;
+wire  recv_byte_en;
 
 //=======================================================
 //  Structural coding
 //=======================================================
 
 
-//assign GPIO[1] = 1'b1;
-//assign LEDR[1] = GPIO[2];
-//assign LEDR[2] = GPIO[3];
-//assign GPIO[4] = 1'b0;
+
 assign LEDR[0] = ~KEY[0];
 
 
@@ -74,30 +71,31 @@ uart my_uart( 	.clk(CLOCK_50),
 					.rx(GPIO[3]),
 					.tx(GPIO[1]),
 					.transmit(recv_byte_en),
-					.tx_byte(recv_byte),
+					.tx_byte(tx_byte),
 					.rx_byte(recv_byte),
 					.is_receiving(LEDR[8]),
 					.is_transmitting(LEDR[7]),
 					.received(recv_byte_en),
 					.recv_error(LEDR[9]));
 					
+BSR my_bsr(
+	.clk(CLOCK_50),
+	.rst_n(KEY[0]),
+	.en(recv_byte_en),
+	.byte_in(recv_byte),
+	.byte_probe0(bsr2decoder0),
+	.byte_probe1(bsr2decoder1),
+	.byte_probe2(bsr2decoder2),
+	.byte_out(tx_byte)
+);
+		
+	
+HexDigit hexdecoder0 (.segs(HEX0), .num(bsr2decoder0[3:0]));
+HexDigit hexdecoder1 (.segs(HEX1), .num(bsr2decoder0[7:4]));
+HexDigit hexdecoder2 (.segs(HEX2), .num(bsr2decoder1[3:0]));
+HexDigit hexdecoder3 (.segs(HEX3), .num(bsr2decoder1[7:4]));
+HexDigit hexdecoder4 (.segs(HEX4), .num(bsr2decoder2[3:0]));
+HexDigit hexdecoder5 (.segs(HEX5), .num(bsr2decoder2[7:4]));
 
-/*
-byte_reg received_byte( .clk(CLOCK_50),
-								.en(recv_byte_en),
-								.byte_in(recv_byte),
-								.byte_out(uart2display),
-								.rst_n(KEY[0]));
-*/
-
-gen_hex lower_nibble(.switch(~KEY[1]),.rst_n(KEY[0]),.hex_number(gen2display[3:0]));
-gen_hex upper_nibble(.switch(~KEY[2]),.rst_n(KEY[0]),.hex_number(gen2display[7:4]));
-
-// Transmited Byte
-HexDigit hex_display_lower_tx(.num(gen2display[3:0]),.segs(HEX4));
-HexDigit hex_display_upper_tx(.num(gen2display[7:4]),.segs(HEX5));
-
-// Received Byte
-HexDigit hex_display_lower_rx(.num(uart2display[3:0]),.segs(HEX0));
-HexDigit hex_display_upper_rx(.num(uart2display[7:4]),.segs(HEX1));
+		
 endmodule
